@@ -1,28 +1,27 @@
 <template>
 	<v-layout row justify-center>
 		<v-dialog
-			v-model="showDiv"
+			v-model="showTrickOverView"
 			persistent
-			max-width="1000"
+			width="60em"
+			height="60em"
 			@click:outside="toggleOverView"
 		>
-			<v-container class="grey lighten-5">
+			<v-container class="dark">
 				<v-row no-gutters>
-					<v-col cols="12" sm="6" md="8">
-						<v-card class="pa-2" outlined tile>
-							<v-row no-gutters>
-								<v-col cols="12" sm="12" md="12">
-									<v-carousel style="height:370px">
-										<v-carousel-item
-											v-for="item in trick.urlPictures"
-											:key="item.id"
-											v-html="getiframe(item.urlPictures)"
-											reverse-transition="fade-transition"
-											transition="fade-transition"
-											style="height:370px"
-										></v-carousel-item> </v-carousel
-								></v-col>
-								<v-col cols="12" sm="12" md="12">
+					<v-col lg="8" sm="8" md="8">
+						<v-card class="pa-2">
+							<v-carousel hide-delimiters>
+								<v-carousel-item
+									v-for="item in trick.urlPictures"
+									:key="item.id"
+									:src="item.urlPictures"
+									reverse-transition="fade-transition"
+									transition="fade-transition"
+									width="100%"
+								></v-carousel-item>
+							</v-carousel>
+							<!-- 					<v-col cols="12" sm="12" md="12">
 									<v-layout align-start justify-end fill-height>
 										<v-card
 											v-for="item in trick.urlPictures"
@@ -35,56 +34,41 @@
 												v-html="getiframeDown(item.urlPictures)"
 											/>
 										</v-card> </v-layout
-								></v-col>
-							</v-row>
+								></v-col> -->
 						</v-card>
 					</v-col>
-					<v-col cols="6" md="4">
-						<v-card class="pa-2" outlined tile>
-							<v-layout fill-height>
-								<v-row>
-									<v-col cols="12"
-										><h2 class="titleV">
-											{{ trick.name }}
-										</h2></v-col
-									>
+					<v-col lg="4" sm="4" md="4">
+						<v-card class="pa-2" height="100%">
+							<v-row>
+								<v-card-title class="trick-name">
+									{{ trick.name }}
+								</v-card-title>
+								<span class="trick-text">
+									{{ trick.quickDescription }}
+								</span>
+								<v-btn
+									color="orange"
+									class="view-FP-button"
+									@click="
+										toggleOverView();
+										openOneTrickFullPage();
+									"
+									>View Full Page</v-btn
+								>
+								<v-card-subtitle block tile outlined class="trick-price"
+									>{{ trick.price }} DT</v-card-subtitle
+								>
 
-									<v-col cols="12"
-										><h4 class="text">
-											{{ trick.quickDescription }}
-										</h4></v-col
-									>
-									<!-- <v-col cols="12"></v-col> -->
-
-									<v-col cols="6">
-										<v-btn
-											color="orange"
-											class="buttonV"
-											@click="
-												toggleOverView();
-												openFull();
-											"
-											>View Full Page</v-btn
-										></v-col
-									>
-
-									<v-col cols="5"
-										><p class="price">{{ trick.price }}DT</p></v-col
-									>
-									<v-col cols="6"></v-col>
-									<v-col cols="6"
-										><v-btn
-											color="orange"
-											class="buttonV"
-											@click="
-												addItemToCart();
-												toggleOverView();
-											"
-											>Add To Cart</v-btn
-										></v-col
-									>
-								</v-row>
-							</v-layout>
+								<v-btn
+									color="orange"
+									class="add-item-to-cart-button"
+									@click="
+										addItemToCart();
+										toggleOverView();
+									"
+									>Add To Cart</v-btn
+								>
+							</v-row>
 						</v-card>
 					</v-col>
 				</v-row>
@@ -97,7 +81,7 @@ import { mapState, mapGetters } from 'vuex';
 import OnetrickFullPage from '../OnetrickFullPage.vue';
 export default {
 	components: { OnetrickFullPage },
-	props: ['showDiv', 'trick'],
+	props: ['showTrickOverView', 'trick'],
 	name: 'TrickOverView',
 	computed: {
 		...mapState(['displayedTricks', 'cart']),
@@ -112,9 +96,12 @@ export default {
 		toggleOverView() {
 			this.$emit('toggle-over-view');
 		},
-		openFull() {
+		openOneTrickFullPage() {
 			// this.full = true;
-			this.$router.push({ name: 'Cards', params: { id: this.trick.id } });
+			this.$router.push({
+				name: 'ItemDetailed',
+				params: { id: this.trick.id },
+			});
 		},
 		bindImg() {},
 		addItemToCart() {
@@ -128,7 +115,7 @@ export default {
 			this.$store.dispatch('addToCart', item);
 		},
 		getiframe(url) {
-			return `<img width="600" height="370" src="${url}"/>`;
+			return `<img  src="${url}"/>`;
 		},
 		getiframeDown(url) {
 			return `<img width="120px" height="120px" src="${url}"/>`;
@@ -142,5 +129,36 @@ export default {
 	top: 0vw;
 	font-weight: bold;
 	font-size: 20px;
+}
+.trick-name {
+	padding-left: 1.5em;
+	font-family: 'Permanent Marker', cursive;
+	font-size: 25px;
+	text-align: justify;
+	text-align: center;
+}
+.trick-text {
+	padding: 1.5em;
+	font-size: 18px;
+	text-align: justify;
+	text-justify: inter-word;
+}
+.add-item-to-cart-button {
+	position: absolute;
+	bottom: 1em;
+	right: 1.5em;
+}
+.trick-price {
+	position: absolute;
+	font-size: 18px;
+	font-weight: 600;
+	bottom: 0.3em;
+	left: 1em;
+	color: white;
+}
+.view-FP-button {
+	position: absolute;
+	bottom: 5em;
+	right: 1.5em;
 }
 </style>
